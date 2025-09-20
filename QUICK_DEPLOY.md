@@ -28,13 +28,13 @@
 ssh root@YOUR_DROPLET_IP
 
 # Run setup script
-curl -sSL https://your-repo-url/deploy/digitalocean-setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/RRRventures-lab/writersblock/main/deploy/digitalocean-setup.sh | bash
 ```
 
 ### Step 3: Deploy Application
 ```bash
 # Clone your repository
-git clone https://your-repo-url.git /var/www/comedy-social
+git clone https://github.com/RRRventures-lab/writersblock.git /var/www/comedy-social
 cd /var/www/comedy-social
 
 # Run deployment

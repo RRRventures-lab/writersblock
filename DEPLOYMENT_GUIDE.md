@@ -68,8 +68,8 @@ systemctl enable mongod redis-server nginx
 mkdir -p /var/www/comedy-social
 cd /var/www/comedy-social
 
-# Clone your repository (replace with your repo URL)
-git clone https://github.com/your-username/comedy-social-app.git .
+# Clone your repository
+git clone https://github.com/RRRventures-lab/writersblock.git .
 ```
 
 2. **Run Deployment Script:**
