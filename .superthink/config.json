@@ -1,0 +1,146 @@
+{
+  "enabled": true,
+  "version": "1.0.0",
+  "description": "Autonomous code quality and correctness validation agent",
+  "focus_areas": {
+    "security": {
+      "enabled": true,
+      "auto_fix": true,
+      "rules": [
+        "api_key_exposure",
+        "sql_injection",
+        "authentication_bypass",
+        "data_leaks",
+        "insider_trading_prevention",
+        "credential_management",
+        "error_handling"
+      ]
+    },
+    "performance": {
+      "enabled": true,
+      "auto_fix": true,
+      "rules": [
+        "latency_sla_violations",
+        "database_optimization",
+        "algorithm_efficiency",
+        "memory_management",
+        "async_await_patterns"
+      ]
+    },
+    "tax_accuracy": {
+      "enabled": true,
+      "auto_fix": true,
+      "rules": [
+        "tax_lot_tracking",
+        "wash_sale_detection",
+        "ltcg_vs_stcg_classification",
+        "cost_basis_calculation",
+        "tax_rate_application",
+        "section_1256_treatment"
+      ]
+    },
+    "trading_logic": {
+      "enabled": true,
+      "auto_fix": false,
+      "rules": [
+        "position_sizing",
+        "risk_limit_enforcement",
+        "portfolio_optimization",
+        "agent_consensus",
+        "event_scoring",
+        "order_execution"
+      ]
+    }
+  },
+  "modes": {
+    "real_time": {
+      "enabled": true,
+      "file_watchers": true,
+      "auto_fix_delay_ms": 2000,
+      "alert_on_critical": true
+    },
+    "pre_commit": {
+      "enabled": true,
+      "blocking": true,
+      "auto_fix_minor": true,
+      "timeout_seconds": 30
+    },
+    "checkpoint": {
+      "enabled": true,
+      "days": [7],
+      "time": "18:00"
+    },
+    "deep_scan": {
+      "enabled": true,
+      "nightly": {
+        "enabled": true,
+        "time": "02:00"
+      },
+      "weekly": {
+        "enabled": true,
+        "day": "Sunday",
+        "time": "03:00"
+      },
+      "monthly": {
+        "enabled": true,
+        "day": 1,
+        "time": "04:00"
+      }
+    }
+  },
+  "severity_levels": {
+    "critical": {
+      "auto_fix": true,
+      "blocks_commit": true,
+      "requires_review": false,
+      "alert_immediately": true
+    },
+    "high": {
+      "auto_fix": true,
+      "blocks_commit": false,
+      "requires_review": false,
+      "alert_immediately": false
+    },
+    "medium": {
+      "auto_fix": false,
+      "blocks_commit": false,
+      "requires_review": true,
+      "alert_immediately": false
+    },
+    "low": {
+      "auto_fix": false,
+      "blocks_commit": false,
+      "requires_review": false,
+      "alert_immediately": false
+    }
+  },
+  "file_patterns": {
+    "monitor": [
+      "src/**/*.py",
+      ".claude/**/*.md",
+      "config/**/*.json",
+      "tests/**/*.py"
+    ],
+    "ignore": [
+      ".superthink/**",
+      ".git/**",
+      "__pycache__/**",
+      "*.pyc",
+      "node_modules/**",
+      ".venv/**"
+    ]
+  },
+  "reporting": {
+    "generate_reports": true,
+    "report_format": "markdown",
+    "include_metrics": true,
+    "upload_artifacts": true,
+    "retention_days": 90
+  },
+  "alerting": {
+    "slack_integration": false,
+    "email_on_critical": false,
+    "github_issues": false,
+    "console_output": true
+  }
+}

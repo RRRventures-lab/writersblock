@@ -1,0 +1,106 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+env/
+.venv
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Superthink Generated Files (keep config, ignore generated reports)
+.superthink/reports/
+.superthink/*.log
+.superthink/metrics.json
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Data Files
+*.csv
+*.json.bak
+*.parquet
+
+# OS
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Temporary
+tmp/
+temp/
+*.temp
+
+# Large Files
+*.large
+*.bin
+
+# API Keys & Secrets (Never commit these)
+credentials.json
+secrets.json
+*.key
+*.pem
+*.private
+
+# Cache
+.cache/
+.mypy_cache/
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+# Keep these:
+!.claude/
+!.superthink/config.json
+!.superthink/rules/
+!.superthink/scanners/
+!.superthink/fixers/
+!.github/workflows/
