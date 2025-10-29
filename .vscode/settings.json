@@ -1,0 +1,298 @@
+{
+  "// ============================================================": "",
+  "// VSCODE SETTINGS FOR SUPERTHINK-INTEGRATED DEVELOPMENT": "",
+  "// ============================================================": "",
+
+  "// Core Editor Configuration": "",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true,
+      "source.fixAll": true
+    }
+  },
+
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.defaultFormatter": "ms-python.python",
+  "editor.rulers": [80, 120],
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 120,
+  "editor.minimap.enabled": false,
+  "editor.inlineSuggest.enabled": true,
+
+  "// ============================================================": "",
+  "// PYTHON CONFIGURATION": "",
+  "// ============================================================": "",
+
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": [
+    "--disable=missing-docstring",
+    "--disable=too-few-public-methods",
+    "--max-line-length=120"
+  ],
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=120",
+    "--extend-ignore=E203,W503"
+  ],
+  "python.linting.mypyEnabled": true,
+  "python.linting.mypyArgs": [
+    "--ignore-missing-imports",
+    "--follow-imports=silent"
+  ],
+
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "tests",
+    "-v",
+    "--tb=short"
+  ],
+
+  "python.analysis.typeCheckingMode": "strict",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportUnusedImport": "warning",
+    "reportUnusedVariable": "warning",
+    "reportMissingTypeStubs": "information"
+  },
+
+  "// ============================================================": "",
+  "// SUPERTHINK CODE ANALYSIS CONFIGURATION": "",
+  "// ============================================================": "",
+
+  "superthink.enabled": true,
+  "superthink.mode": "real-time",
+  "superthink.focus-areas": [
+    "security",
+    "performance",
+    "tax-accuracy",
+    "trading-logic"
+  ],
+  "superthink.real-time-feedback": true,
+  "superthink.auto-fix-enabled": true,
+  "superthink.show-diagnostics": true,
+  "superthink.diagnostic-level": "all",
+
+  "// File Monitoring": "",
+  "superthink.watch-patterns": [
+    "src/**/*.py",
+    "tests/**/*.py"
+  ],
+  "superthink.watch-interval-ms": 2000,
+  "superthink.report-interval-ms": 5000,
+
+  "// Severity Thresholds": "",
+  "superthink.block-on-critical": true,
+  "superthink.warn-on-high": true,
+  "superthink.show-medium": true,
+  "superthink.show-low": false,
+
+  "// Performance Profiling": "",
+  "superthink.enable-profiling": true,
+  "superthink.profile-latency": true,
+  "superthink.profile-memory": true,
+  "superthink.latency-threshold-ms": 5000,
+  "superthink.memory-alert-mb": 1000,
+
+  "// ============================================================": "",
+  "// LINTER INTEGRATION": "",
+  "// ============================================================": "",
+
+  "pylint.path": [
+    "${workspaceFolder}/venv/bin/pylint"
+  ],
+  "pylint.showNotifications": "onWarning",
+
+  "flake8.path": [
+    "${workspaceFolder}/venv/bin/flake8"
+  ],
+
+  "mypy.runUsingActiveInterpreter": true,
+  "mypy.showError": true,
+
+  "// ============================================================": "",
+  "// GIT INTEGRATION": "",
+  "// ============================================================": "",
+
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.ignoreLimitWarning": true,
+
+  "// Pre-commit hook status": "",
+  "git.enabled": true,
+  "gitlens.codeLens.enabled": true,
+  "gitlens.currentLineBlame": true,
+
+  "// ============================================================": "",
+  "// ERROR LENS CONFIGURATION": "",
+  "// ============================================================": "",
+
+  "errorLens.enabled": true,
+  "errorLens.followCursorMoreFocused": true,
+  "errorLens.gutterIconsEnabled": true,
+  "errorLens.messageTemplate": "$message",
+  "errorLens.messageMaxChars": 80,
+  "errorLens.focusLinesExcept": [],
+  "errorLens.excludePatterns": [
+    "**/node_modules/**"
+  ],
+
+  "// ============================================================": "",
+  "// DEBUG CONFIGURATION": "",
+  "// ============================================================": "",
+
+  "python.debugging.logToFile": true,
+  "python.linting.pytestPath": "${workspaceFolder}/venv/bin/pytest",
+
+  "// ============================================================": "",
+  "// SUPERTHINK DIAGNOSTICS DISPLAY": "",
+  "// ============================================================": "",
+
+  "problems.decorations.enabled": true,
+  "problems.showCurrentInStatus": true,
+
+  "// Problem matching with color coding": "",
+  "problems.colors": {
+    "error": "#E53935",
+    "warning": "#F57C00",
+    "info": "#1976D2",
+    "hint": "#00897B"
+  },
+
+  "// ============================================================": "",
+  "// WORKSPACE ORGANIZATION": "",
+  "// ============================================================": "",
+
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/.coverage": true,
+    "**/htmlcov": true,
+    "**/.egg-info": true,
+    "**/.tox": true,
+    ".venv": true
+  },
+
+  "files.watcherExclude": {
+    "**/.git": true,
+    "**/.superthink/reports/**": true,
+    "**/node_modules/**": true,
+    "**/.pytest_cache/**": true
+  },
+
+  "search.exclude": {
+    "**/.git": true,
+    "**/.venv": true,
+    "**/venv": true,
+    "**/.pytest_cache": true,
+    "**/htmlcov": true
+  },
+
+  "// ============================================================": "",
+  "// SUPERTHINK REPORT VIEWER": "",
+  "// ============================================================": "",
+
+  "files.associations": {
+    ".superthink/fixes.log": "json",
+    ".superthink/metrics.json": "json",
+    ".superthink/reports/**/*.md": "markdown"
+  },
+
+  "// ============================================================": "",
+  "// CONTEXT MANAGEMENT": "",
+  "// ============================================================": "",
+
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true,
+  "files.insertFinalNewline": true,
+
+  "// ============================================================": "",
+  "// EXTENSION SETTINGS": "",
+  "// ============================================================": "",
+
+  "better-comments.tags": [
+    {
+      "tag": "!",
+      "color": "#FF2D00",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": true,
+      "italic": false
+    },
+    {
+      "tag": "?",
+      "color": "#3498DB",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "//",
+      "color": "#474747",
+      "strikethrough": true,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "TODO",
+      "color": "#FF8C00",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": true,
+      "italic": false
+    },
+    {
+      "tag": "FIXME",
+      "color": "#FF0000",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": true,
+      "italic": false
+    },
+    {
+      "tag": "HACK",
+      "color": "#FF6B6B",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "NOTE",
+      "color": "#90EE90",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    }
+  ],
+
+  "// ============================================================": "",
+  "// FINAL SETTINGS": "",
+  "// ============================================================": "",
+
+  "telemetry.telemetryLevel": "off",
+  "files.autoSave": "onFocusChange",
+  "explorer.confirmDelete": true,
+  "explorer.confirmDragAndDrop": true
+}

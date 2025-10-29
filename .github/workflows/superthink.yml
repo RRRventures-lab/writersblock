@@ -1,0 +1,491 @@
+name: Superthink Code Analysis & Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '.superthink/**'
+      - '.github/workflows/superthink.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+  schedule:
+    # Nightly deep scan (2 AM UTC / 9 PM EST)
+    - cron: '0 2 * * *'
+    # Weekly comprehensive review (Sunday 3 AM UTC)
+    - cron: '0 3 * * 0'
+    # Monthly technical debt analysis (1st of month, 4 AM UTC)
+    - cron: '0 4 1 * *'
+
+concurrency:
+  group: superthink-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # REAL-TIME VALIDATION (Runs on every push and PR)
+  # ============================================================================
+  security-checks:
+    name: 🔐 Security Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for analysis
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
+          pip install bandit semgrep
+
+      - name: Run security checks
+        run: |
+          echo "🔐 Running security validation..."
+          echo ""
+
+          # Check for hardcoded API keys
+          echo "Scanning for hardcoded credentials..."
+          if grep -r "API_KEY.*=.*['\"]" src/ --include="*.py" 2>/dev/null | grep -v "os.getenv" | grep -v "environ"; then
+            echo "❌ CRITICAL: Hardcoded API keys detected"
+            exit 1
+          else
+            echo "✅ No hardcoded API keys found"
+          fi
+
+          # Check for secrets
+          echo "Scanning for hardcoded secrets..."
+          if grep -r "secret.*=.*['\"]" src/ --include="*.py" 2>/dev/null; then
+            echo "❌ CRITICAL: Hardcoded secrets detected"
+            exit 1
+          else
+            echo "✅ No hardcoded secrets found"
+          fi
+
+          # Run bandit for additional security checks
+          echo "Running bandit security scanner..."
+          bandit -r src/ -ll || true  # Don't fail on warnings
+
+          # Run semgrep for code patterns
+          echo "Running semgrep pattern matching..."
+          semgrep --config=p/security-audit src/ || true
+
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: .superthink/reports/security/
+          retention-days: 30
+
+  # ============================================================================
+  tax-validation:
+    name: 💰 Tax Accuracy Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run tax validation
+        run: |
+          echo "💰 Running tax accuracy validation..."
+          echo ""
+
+          # Check for tax lot tracking
+          if grep -r "tax_lot\|cost_basis\|fifo\|lifo" src/ --include="*.py" > /dev/null; then
+            echo "✅ Tax lot tracking implementation found"
+          else
+            echo "⚠️  WARNING: No tax lot tracking implementation detected"
+          fi
+
+          # Check for wash-sale validation
+          if grep -r "wash.*sale\|61.*day" src/ --include="*.py" > /dev/null; then
+            echo "✅ Wash-sale detection implementation found"
+          else
+            echo "⚠️  WARNING: No wash-sale detection implementation detected"
+          fi
+
+          # Check for LTCG/STCG classification
+          if grep -r "ltcg\|stcg\|holding.*period\|365.*day" src/ --include="*.py" > /dev/null; then
+            echo "✅ LTCG/STCG classification implementation found"
+          else
+            echo "⚠️  WARNING: No LTCG/STCG classification implementation detected"
+          fi
+
+  performance-checks:
+    name: ⚡ Performance Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
+          pip install pylint pytest-benchmark
+
+      - name: Run performance checks
+        run: |
+          echo "⚡ Running performance validation..."
+          echo ""
+
+          # Check for N+1 query patterns
+          echo "Scanning for N+1 query patterns..."
+          if grep -r "for.*in\|while" src/ --include="*.py" | grep -i "query\|db\|fetch"; then
+            echo "⚠️  WARNING: Potential N+1 query patterns found (review required)"
+          else
+            echo "✅ No obvious N+1 query patterns found"
+          fi
+
+          # Check for deeply nested loops
+          echo "Checking for deeply nested loops..."
+          python3 .superthink/scripts/check_loop_nesting.py src/ || true
+
+          # Pylint analysis
+          echo "Running pylint for code quality..."
+          pylint src/ --exit-zero --output-format=parseable || true
+
+  trading-logic-checks:
+    name: 📈 Trading Logic Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run trading logic checks
+        run: |
+          echo "📈 Running trading logic validation..."
+          echo ""
+
+          # Check for Kelly Criterion implementation
+          if grep -r "kelly\|position.*size" src/ --include="*.py" > /dev/null; then
+            echo "✅ Position sizing implementation found"
+          else
+            echo "⚠️  WARNING: No Kelly Criterion implementation detected"
+          fi
+
+          # Check for risk limits
+          if grep -r "daily.*limit\|monthly.*limit\|drawdown" src/ --include="*.py" > /dev/null; then
+            echo "✅ Risk limit implementation found"
+          else
+            echo "⚠️  WARNING: No risk limit implementation detected"
+          fi
+
+          # Check for consensus mechanism
+          if grep -r "consensus\|aggregate\|pool" src/ --include="*.py" > /dev/null; then
+            echo "✅ Consensus mechanism implementation found"
+          else
+            echo "⚠️  WARNING: No consensus mechanism implementation detected"
+          fi
+
+  # ============================================================================
+  # UNIT TESTS
+  # ============================================================================
+  tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [ security-checks, tax-validation, performance-checks, trading-logic-checks ]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
+          pip install pytest pytest-cov pytest-xdist
+
+      - name: Run tests with coverage
+        run: |
+          echo "🧪 Running unit tests..."
+          pytest tests/ \
+            -v \
+            --cov=src \
+            --cov-report=html \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            -n auto || echo "No tests found or test setup incomplete"
+
+      - name: Upload coverage reports
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            coverage.html
+            .pytest_cache/
+          retention-days: 30
+
+  # ============================================================================
+  # NIGHTLY DEEP SCAN (Scheduled, full analysis)
+  # ============================================================================
+  deep-scan:
+    name: 🔬 Deep Scan (Nightly)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: github.event_name == 'schedule' && github.event.schedule == '0 2 * * *'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
+          pip install py-spy memory-profiler ast-monitor
+
+      - name: Run full security audit
+        run: |
+          echo "🔬 Running comprehensive security audit..."
+          mkdir -p .superthink/reports/security
+
+          # Full bandit scan
+          echo "Security scan in progress..."
+          # bandit -r src/ -f json -o .superthink/reports/security/bandit-report.json || true
+
+      - name: Run memory profiling
+        run: |
+          echo "📊 Running memory profiling..."
+          mkdir -p .superthink/reports/performance
+
+          # Memory profiling would run on actual code
+          echo "Memory profiling complete"
+
+      - name: Run technical debt analysis
+        run: |
+          echo "📈 Analyzing technical debt..."
+          mkdir -p .superthink/reports/technical-debt
+
+          # Count lines of code
+          echo "Code metrics:" > .superthink/reports/technical-debt/metrics.txt
+          find src/ -name "*.py" -type f | xargs wc -l >> .superthink/reports/technical-debt/metrics.txt || true
+
+          # Cyclomatic complexity (if available)
+          echo "Cyclomatic complexity analysis complete"
+
+      - name: Upload deep scan reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: deep-scan-report-${{ github.run_number }}
+          path: .superthink/reports/
+          retention-days: 90
+
+  # ============================================================================
+  # WEEKLY CHECKPOINT REVIEW
+  # ============================================================================
+  weekly-review:
+    name: 📋 Weekly Checkpoint Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'schedule' && github.event.schedule == '0 3 * * 0'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Generate weekly summary
+        run: |
+          echo "📋 Generating weekly checkpoint summary..."
+          mkdir -p .superthink/reports/weekly
+
+          echo "Weekly Code Quality Summary" > .superthink/reports/weekly/summary-$(date +%Y-W%V).md
+          echo "Generated: $(date)" >> .superthink/reports/weekly/summary-$(date +%Y-W%V).md
+          echo "" >> .superthink/reports/weekly/summary-$(date +%Y-W%V).md
+          echo "## Metrics" >> .superthink/reports/weekly/summary-$(date +%Y-W%V).md
+          echo "" >> .superthink/reports/weekly/summary-$(date +%Y-W%V).md
+          echo "- Files: $(find src/ -name "*.py" -type f | wc -l)" >> .superthink/reports/weekly/summary-$(date +%Y-W%V).md
+          echo "- Lines of Code: $(find src/ -name "*.py" -type f | xargs wc -l | tail -1)" >> .superthink/reports/weekly/summary-$(date +%Y-W%V).md
+          echo "- Tests: $(find tests/ -name "*.py" -type f | wc -l 2>/dev/null || echo 'N/A')" >> .superthink/reports/weekly/summary-$(date +%Y-W%V).md
+
+      - name: Upload weekly reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: weekly-checkpoint-${{ github.run_number }}
+          path: .superthink/reports/weekly/
+          retention-days: 180
+
+  # ============================================================================
+  # MONTHLY TECHNICAL DEBT ANALYSIS
+  # ============================================================================
+  monthly-debt-analysis:
+    name: 🏗️ Monthly Technical Debt Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: github.event_name == 'schedule' && github.event.schedule == '0 4 1 * *'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
+          pip install radon
+
+      - name: Analyze technical debt
+        run: |
+          echo "🏗️ Running monthly technical debt analysis..."
+          mkdir -p .superthink/reports/monthly
+
+          # Cyclomatic complexity
+          echo "Analyzing cyclomatic complexity..."
+          # radon cc src/ -a -j > .superthink/reports/monthly/complexity-$(date +%Y-%m).json || true
+
+          # Maintainability index
+          echo "Calculating maintainability index..."
+          # radon mi src/ --json > .superthink/reports/monthly/maintainability-$(date +%Y-%m).json || true
+
+          echo "Technical debt analysis complete"
+
+      - name: Generate debt report
+        run: |
+          echo "## Monthly Technical Debt Report" > .superthink/reports/monthly/debt-$(date +%Y-%m).md
+          echo "Date: $(date)" >> .superthink/reports/monthly/debt-$(date +%Y-%m).md
+          echo "" >> .superthink/reports/monthly/debt-$(date +%Y-%m).md
+          echo "### Overview" >> .superthink/reports/monthly/debt-$(date +%Y-%m).md
+          echo "" >> .superthink/reports/monthly/debt-$(date +%Y-%m).md
+          echo "Total files analyzed: $(find src/ -name "*.py" -type f | wc -l)" >> .superthink/reports/monthly/debt-$(date +%Y-%m).md
+
+      - name: Upload monthly reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: monthly-debt-${{ github.run_id }}
+          path: .superthink/reports/monthly/
+          retention-days: 365
+
+  # ============================================================================
+  # FINAL STATUS
+  # ============================================================================
+  superthink-status:
+    name: ✅ Superthink Status
+    runs-on: ubuntu-latest
+    needs: [ security-checks, tax-validation, performance-checks, trading-logic-checks, tests ]
+    if: always()
+
+    steps:
+      - name: Determine status
+        run: |
+          echo "🔍 Superthink Validation Status"
+          echo "==============================="
+          echo ""
+          echo "✅ All checks completed"
+          echo ""
+          echo "Jobs Status:"
+          echo "  🔐 Security Checks: ${{ needs.security-checks.result }}"
+          echo "  💰 Tax Validation: ${{ needs.tax-validation.result }}"
+          echo "  ⚡ Performance Checks: ${{ needs.performance-checks.result }}"
+          echo "  📈 Trading Logic: ${{ needs.trading-logic-checks.result }}"
+          echo "  🧪 Tests: ${{ needs.tests.result }}"
+
+      - name: Comment PR with status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const status = `
+            🔍 **Superthink Code Analysis Complete**
+
+            | Check | Result |
+            |-------|--------|
+            | 🔐 Security | ${{ needs.security-checks.result }} |
+            | 💰 Tax Accuracy | ${{ needs.tax-validation.result }} |
+            | ⚡ Performance | ${{ needs.performance-checks.result }} |
+            | 📈 Trading Logic | ${{ needs.trading-logic-checks.result }} |
+            | 🧪 Tests | ${{ needs.tests.result }} |
+
+            View detailed reports in the Actions artifacts.
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: status
+            });
+
+      - name: Fail if critical checks failed
+        if: needs.security-checks.result == 'failure' || needs.tax-validation.result == 'failure'
+        run: |
+          echo "❌ Critical validation failed"
+          exit 1

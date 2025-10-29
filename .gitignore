@@ -35,12 +35,15 @@ env/
 .env
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+
+# Keep VS Code settings (not .vscode/)
+!.vscode/settings.json
+!.vscode/extensions.json
 
 # Testing
 .pytest_cache/
@@ -51,7 +54,10 @@ htmlcov/
 # Superthink Generated Files (keep config, ignore generated reports)
 .superthink/reports/
 .superthink/*.log
-.superthink/metrics.json
+
+# Keep Superthink metrics and dashboard
+!.superthink/metrics.json
+!.superthink/METRICS_DASHBOARD.md
 
 # Logs
 logs/
