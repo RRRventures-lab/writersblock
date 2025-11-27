@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=false
+      - DATABASE_URL=postgresql://writers_block:password@db:5432/writers_block
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=["http://localhost:5173", "http://localhost:3000", "http://localhost"]
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    networks:
+      - writers-block-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=writers_block
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=writers_block
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - writers-block-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U writers_block"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - writers-block-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  writers-block-network:
+    driver: bridge
